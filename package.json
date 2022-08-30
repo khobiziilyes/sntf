@@ -36,7 +36,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "axios": "^0.27.2",
-    "csvtojson": "^2.0.10",
+    "csv-parse": "^5.3.0",
     "tslib": "~2.4"
   }
 }
