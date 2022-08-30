@@ -1,40 +1,110 @@
+interface seatsClass {
+  exists: boolean;
+  seats: boolean;
+  couchette: boolean;
+}
 export interface ITrain {
   id: number;
+  number: string;
+  published: boolean;
+  available: boolean;
+
+  distinations: string[];
+  relations: string[];
+
+  region_id: number;
+  bareme_id: number;
+  line_id: number;
+
+  start_date: Date;
+  end_date: Date;
+
+  line_type: string;
+
+  /*
+  public class LigneType {
+    public static int BL = 1;
+    public static int GL = 3;
+    public static int RN = 2;
+
+    public static String type(int i) {
+        if (i == BL) {
+            return "Ligne Banlieue";
+        }
+        if (i == RN) {
+            return "Ligne Régionale";
+        }
+        return i == GL ? "Grande Ligne" : "";
+    }
+}
+
+  */
+
+  train_type: 'DSL' | 'Coradia' | 'Coradia DSL';
+
+  mode_circulation:
+    | 'ALWAYS'
+    | 'EXCEPT_FRIDAY_AND_HOLIDAYS'
+    | 'ONLY_FRIDAY_AND_HOLIDAYS'
+    | 'WEEKDAYS';
+
+  restauration: boolean;
+
+  classes: {
+    first: seatsClass;
+    second: seatsClass;
+  };
+
+  available_days: {
+    Sun: boolean;
+    Mon: boolean;
+    Tue: boolean;
+    Wed: boolean;
+    Thu: boolean;
+    Fri: boolean;
+    Sat: boolean;
+  };
+
+  comments: { [lang: string]: string };
+}
+
+export interface IRawTrain {
+  id: string;
   numero: string;
 
-  date_debut: string; // TODO:
-  date_fin: '00/00/00'; // TODO:
+  date_debut: string;
+  date_fin: string;
 
-  type_ligne: number;
-  type_train: number;
+  type_ligne: string;
+  type_train: string;
 
-  mode_circulation: boolean;
-  restauration: boolean;
-  premiere_classe: boolean;
-  published: boolean;
-  couchette: boolean;
-  bareme_id: number;
+  mode_circulation: string;
+  restauration: string;
+  premiere_classe: string;
+  published: string;
+  couchette: string;
+  bareme_id: string;
 
   commentaire_fr: string;
   commentaire_ar: string;
   commentaire_en: string;
 
-  region_id: number;
+  region_id: string;
 
-  assise_premiere_classe: boolean;
-  assise_deuxieme_classe: boolean;
-  couchette_premiere_classe: boolean;
-  couchette_deuxieme_classe: boolean;
+  assise_premiere_classe: string;
+  assise_deuxieme_classe: string;
+  couchette_premiere_classe: string;
+  couchette_deuxieme_classe: string;
 
-  line: number;
+  line: string;
 
-  sam: boolean;
-  dim: boolean;
-  lun: boolean;
-  mar: boolean;
-  mer: boolean;
-  jeu: boolean;
-  ven: boolean;
+  sam: string;
+  dim: string;
+  lun: string;
+  mar: string;
+  mer: string;
+  jeu: string;
+  ven: string;
 
   distination: string;
   relation: string;

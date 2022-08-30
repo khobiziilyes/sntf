@@ -2,6 +2,18 @@ type Nnumber = number | null;
 
 export interface IGare {
   id: number;
+  region_code: number;
+  names: {
+    [lang: string]: string;
+  };
+  location: {
+    lat: number;
+    log: number;
+  };
+  next: number[];
+}
+export interface IRawGare {
+  id: number;
 
   nom_fr: string;
   nom_ar: string;

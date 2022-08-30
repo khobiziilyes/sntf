@@ -1,13 +1,22 @@
 export interface IBareme {
   id: number;
-  nom: string;
+  name: string;
   published: boolean;
 
-  taxe_fixe1: number;
-  taxe_fixe2: number;
+  taxes: { [lang: string]: number }[];
 
-  taxe_fixe1_ar: number;
-  taxe_fixe2_ar: number;
+  comments: { [lang: string]: string };
+}
+export interface IRawBareme {
+  id: string;
+  nom: string;
+  published: string;
+
+  taxe_fixe1: string;
+  taxe_fixe2: string;
+
+  taxe_fixe1_ar: string;
+  taxe_fixe2_ar: string;
 
   commentaire_fr: string;
   commentaire_ar: string;
