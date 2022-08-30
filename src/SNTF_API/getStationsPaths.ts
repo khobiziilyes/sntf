@@ -6,7 +6,7 @@ export function getStationsPaths(
   trainsById: { [train_id: number]: ITrain },
   startStationId: number,
   endStationId: number,
-): number[][] {
+): IHoraire[][] {
   // Horaires of trains that will go out from startStation to ANYWHERE
   // Map each horaire to their proper train, with filtering only published ones.
   const availableTrains: ITrain[] = horaires
@@ -33,7 +33,7 @@ export function getStationsPaths(
       pathsByTrain.push(trainPath);
   }
 
-  return pathsByTrain.map((_) => _.map((_) => _.id));
+  return pathsByTrain;
 }
 
 // This is just an optimized function, but it may return horaires that have a train_id that doesn't exist SO FILTER THEM!!
@@ -45,11 +45,14 @@ export function getStationsPaths2(
   const paths = Array<IHoraire[]>();
 
   for (const horaires of horairesByTrainId) {
-    const horairesPath = Array<IHoraire>();
+    let horairesPath = Array<IHoraire>();
     let foundStart = false;
 
     for (const horaire of horaires) {
-      if (horaire.gare_id === startStationId) foundStart = true;
+      if (horaire.gare_id === startStationId) {
+        if (foundStart) horairesPath = [];
+        foundStart = true;
+      }
 
       if (foundStart) {
         horairesPath.push(horaire);

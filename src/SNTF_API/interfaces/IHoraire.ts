@@ -6,7 +6,7 @@ export interface IHoraire {
 
   time: Date;
 
-  available_tomorrow: boolean;
+  is_time_tomorrow: boolean;
   distance: number;
 
   time_str: string;
