@@ -35,3 +35,34 @@ export function getStationsPaths(
 
   return pathsByTrain.map((_) => _.map((_) => _.id));
 }
+
+// This is just an optimized function, but it may return horaires that have a train_id that doesn't exist SO FILTER THEM!!
+export function getStationsPaths2(
+  horairesByTrainId: IHoraire[][],
+  startStationId: number,
+  endStationId: number,
+): IHoraire[][] {
+  const paths = Array<IHoraire[]>();
+
+  for (const horaires of horairesByTrainId) {
+    const horairesPath = Array<IHoraire>();
+    let foundStart = false;
+
+    for (const horaire of horaires) {
+      if (horaire.gare_id === startStationId) foundStart = true;
+
+      if (foundStart) {
+        horairesPath.push(horaire);
+        if (horaire.gare_id === endStationId) break;
+      }
+    }
+
+    if (
+      horairesPath.length >= 2 &&
+      horairesPath.at(-1).gare_id === endStationId
+    )
+      paths.push(horairesPath);
+  }
+
+  return paths;
+}
