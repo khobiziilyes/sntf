@@ -1,6 +1,10 @@
 import { IHoraire } from './interfaces/IHoraire.js';
 import { ITrain } from './interfaces/ITrain.js';
 
+function sortHoraires(arr: IHoraire[][]): IHoraire[][] {
+  return arr.sort((a, b) => a[0].timestamp - b[0].timestamp);
+}
+
 export function getStationsPaths(
   horaires: IHoraire[],
   trainsById: { [train_id: number]: ITrain },
@@ -33,18 +37,18 @@ export function getStationsPaths(
       pathsByTrain.push(trainPath);
   }
 
-  return pathsByTrain;
+  return sortHoraires(pathsByTrain);
 }
 
 // This is just an optimized function, but it may return horaires that have a train_id that doesn't exist SO FILTER THEM!!
 export function getStationsPaths2(
-  horairesByTrainId: IHoraire[][],
+  horairesGroupedByTrain: IHoraire[][],
   startStationId: number,
   endStationId: number,
 ): IHoraire[][] {
   const paths = Array<IHoraire[]>();
 
-  for (const horaires of horairesByTrainId) {
+  for (const horaires of horairesGroupedByTrain) {
     let horairesPath = Array<IHoraire>();
     let foundStart = false;
 
@@ -67,5 +71,5 @@ export function getStationsPaths2(
       paths.push(horairesPath);
   }
 
-  return paths;
+  return sortHoraires(paths);
 }

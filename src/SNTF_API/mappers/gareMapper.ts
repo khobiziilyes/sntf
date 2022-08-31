@@ -1,14 +1,27 @@
 import { IGare, IRawGare } from '../interfaces/IGare.js';
 
+function parseInt(str: string): number | null {
+  const parsed = Number.parseInt(str);
+  if (Number.isNaN(parsed)) return null;
+
+  return parsed;
+}
+
 export function gareMapper(obj: IRawGare): IGare {
   const next = Array<number>();
 
   // eslint-disable-next-line no-constant-condition
   for (let i = 1; true; i++) {
     const fr: string = obj[`suivant${i}`];
-    if (fr === null || fr === undefined) break;
+    const ar: string = obj[`suivant${i}_ar`];
 
-    next.push(+fr);
+    if (fr === undefined && ar === undefined) break;
+
+    const parsedFr = parseInt(fr);
+    const parsedAr = parseInt(ar);
+
+    if (parsedFr) next.push(parsedFr);
+    if (parsedAr) next.push(parsedAr);
   }
 
   return {
