@@ -19,26 +19,7 @@ export interface ITrain {
   start_date: Date;
   end_date: Date;
 
-  line_type: string;
-
-  /*
-  public class LigneType {
-    public static int BL = 1;
-    public static int GL = 3;
-    public static int RN = 2;
-
-    public static String type(int i) {
-        if (i == BL) {
-            return "Ligne Banlieue";
-        }
-        if (i == RN) {
-            return "Ligne Régionale";
-        }
-        return i == GL ? "Grande Ligne" : "";
-    }
-}
-
-  */
+  line_type: 'Banlieue' | 'Regionale' | 'Grande';
 
   train_type: 'DSL' | 'Coradia' | 'Coradia DSL';
 

@@ -14,9 +14,9 @@ export function getStationsPaths(
   // Horaires of trains that will go out from startStation to ANYWHERE
   // Map each horaire to their proper train, with filtering only published ones.
   const availableTrains: ITrain[] = horaires
-    .filter((_) => _.gare_id === startStationId)
-    .map((_) => trainsById[_.train_id])
-    .filter((_) => _);
+    .filter(_ => _.gare_id === startStationId)
+    .map(_ => trainsById[_.train_id])
+    .filter(_ => _);
 
   const pathsByTrain: IHoraire[][] = [];
 
@@ -46,6 +46,9 @@ export function getStationsPaths2(
   startStationId: number,
   endStationId: number,
 ): IHoraire[][] {
+  if (startStationId === endStationId)
+    throw new Error('The stations can not be equivalent.');
+
   const paths = Array<IHoraire[]>();
 
   for (const horaires of horairesGroupedByTrain) {

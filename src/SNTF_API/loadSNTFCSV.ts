@@ -11,17 +11,21 @@ export async function loadSNTFCSV<T>(
 
   const promise = new Promise<{ [key: string]: string }[]>(
     (resolve, reject) => {
-      parse(data, { columns: true }, (err, records) => {
-        if (err) return reject();
-        return resolve(records);
-      });
+      parse(
+        data,
+        { columns: true, relax_column_count: true },
+        (err, records) => {
+          if (err) return reject();
+          return resolve(records);
+        },
+      );
     },
   );
 
   return (await promise)
-    .map((elem) =>
+    .map(elem =>
       Object.fromEntries(
-        Object.entries(elem).map((entry) => [
+        Object.entries(elem).map(entry => [
           entry[0],
           parseNullableString(entry[1].trim()),
         ]),

@@ -3,7 +3,7 @@ export interface IBareme {
   name: string;
   published: boolean;
 
-  taxes: { [lang: string]: number }[];
+  taxes: number[];
 
   comments: { [lang: string]: string };
 }

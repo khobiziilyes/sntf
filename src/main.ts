@@ -5,6 +5,7 @@ import {
   mappers,
   getStationsPaths2,
   buildCompoundPath,
+  getPathDistances,
 } from './SNTF_API/index.js';
 import { IGare, IHoraire } from './SNTF_API/interfaces/index.js';
 import { byId, groupBy } from './utils.js';
@@ -22,6 +23,10 @@ const annaba = 71;
 const agha = 37;
 const oran = 305;
 const tlemcen = 424;
+const kadiria = 551;
+const draElMizan = 162;
+const bouira = 126;
+const lakhdaria = 251;
 
 function csvLoader<T>(dataName: string, mapper: (any) => T): Promise<T[]> {
   return loadSNTFCSV(axiosClient, dataName, mapper);
@@ -33,8 +38,11 @@ function toString(arr: IHoraire[][]): string[][] {
   );
 }
 
-// const baremes = await loadSNTFCSV('baremes', baremeMapper);
-// const prix = await loadSNTFCSV('prix', priceMapper);
+const baremes = await csvLoader('baremes', mappers.baremeMapper);
+const baremesById = byId(baremes, _ => _.id);
+
+const prix = await csvLoader('prix', mappers.priceMapper);
+const prixByBareme = groupBy(prix, 'bareme_id');
 
 const gares = await csvLoader('gares', mappers.gareMapper);
 const garesById = byId(gares, _ => _.id);
@@ -54,22 +62,20 @@ const trainsById = byId(trains, _ => _.id);
 const horaires = (await csvLoader('horaires', mappers.horaireMapper)).sort(
   (a, b) => a.timestamp - b.timestamp,
 );
+
 const horairesGroupedByTrain = Object.values(groupBy(horaires, 'train_id'));
 
-const compoundPath = buildCompoundPath(
+/* const compoundPath = buildCompoundPath(
   garesByNext.get(oran),
   (a, b) => getStationsPaths2(horairesGroupedByTrain, a, b),
   annaba,
   oran,
-).map(_ => toString(_));
+).map(_ => toString(_)); */
 
-debugger;
-
-// make sure the stations arent't the same.
-const paths = toString(
-  getStationsPaths2(horairesGroupedByTrain, oran, agha).filter(
-    _ => trainsById[_[0].train_id],
-  ),
-);
+const paths = getStationsPaths2(
+  horairesGroupedByTrain,
+  bouira,
+  lakhdaria,
+).filter(_ => trainsById[_[0].train_id]); // Interesting: gare_id
 
 debugger;

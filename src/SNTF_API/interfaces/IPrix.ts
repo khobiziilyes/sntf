@@ -1,7 +1,7 @@
 export interface IPrix {
   id: number;
   bareme_id: number;
-  classe_id: number;
+  classe: number;
 
   distances: number[];
   reductions: number[];

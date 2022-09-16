@@ -25,6 +25,15 @@ export function trainMapper(obj: IRawTrain): ITrain {
     return 'ALWAYS';
   })();
 
+  const line_type = (() => {
+    const original_type = +obj.type_ligne;
+
+    if (original_type === 1) return 'Banlieue';
+    if (original_type === 2) return 'Regionale';
+
+    return 'Grande';
+  })();
+
   return {
     id: +obj.id,
     number: obj.numero,
@@ -41,7 +50,7 @@ export function trainMapper(obj: IRawTrain): ITrain {
     start_date: new Date(), // TODO:
     end_date: new Date(), // TODO:
 
-    line_type: obj.type_ligne,
+    line_type,
     train_type: 'Coradia', // TODO: obj.type_train
 
     mode_circulation,
