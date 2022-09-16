@@ -27,3 +27,7 @@ build/
 
 # Misc
 .DS_Store
+# Local Netlify folder
+.netlify
+
+.env
