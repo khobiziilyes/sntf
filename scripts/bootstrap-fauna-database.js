@@ -1,4 +1,7 @@
-const faunadb = require('faunadb');
+import * as dotenv from 'dotenv';
+dotenv.config();
+import faunadb from 'faunadb';
+
 const q = faunadb.query;
 
 const { FAUNA_DB_SECRET } = process.env;
@@ -6,33 +9,82 @@ const { FAUNA_DB_SECRET } = process.env;
 if (!FAUNA_DB_SECRET) {
   console.log('Fauna secret is missing ...');
 } else {
-  createFaunaDB(FAUNA_DB_SECRET).then(() => {
-    console.log('Database created');
+  const client = new faunadb.Client({
+    secret: FAUNA_DB_SECRET,
   });
+
+  // prettier-ignore
+  Promise.resolve(client)
+    // .then(dropCollections)
+    .then(createFaunaDB)
+    .then(addSomeData);
 }
 
-function createFaunaDB(key) {
-  const client = new faunadb.Client({
-    secret: key,
-  });
+async function dropCollections(client) {
+  const ref = q.Collection('horaires');
+  const refs = [ref];
 
-  return client
-    .query(q.Create(q.Ref('classes'), { name: 'todos' }))
-    .then(() => {
-      return client.query(
+  // prettier-ignore
+  await client.query(
+    q.Let(
+      {
+        arr: q.Filter(refs,
+          q.Lambda('ref',
+            q.Exists(q.Var('ref'))
+          )
+        )
+      },
+      q.Map(q.Var('arr'),
+        q.Lambda('ref',
+          q.Delete(q.Var('ref'))
+        )
+      )
+    )
+  );
+
+  return client;
+}
+
+async function addSomeData(client) {
+  const horaires = [
+    {
+      data: {
+        a: 'b',
+      },
+    },
+    {
+      data: {
+        a: 'b',
+      },
+    },
+  ];
+
+  await client.query(
+    q.Map(
+      horaires,
+      q.Lambda('data', q.Create(q.Collection('horaires'), q.Var('data'))),
+    ),
+  );
+
+  return client;
+}
+
+async function createFaunaDB(client) {
+  // prettier-ignore
+  await client.query(
+    q.Do(
+      q.CreateCollection({ name: 'versions' }),
+      q.CreateCollection({ name: 'horaires' })
+    )
+  );
+  /* .then(() =>
+      client.query(
         q.Create(q.Ref('indexes'), {
-          name: 'all_todos',
-          source: q.Ref('classes/todos'),
+          name: 'allHoraires',
+          source: q.Collection('horaires'),
         }),
-      );
-    })
-    .catch(e => {
-      if (
-        e.requestResult.statusCode === 400 &&
-        e.message === 'instance not unique'
-      ) {
-        console.log('DB already exists');
-        throw e;
-      }
-    });
+      ),
+    ) */
+
+  return client;
 }
