@@ -3,12 +3,12 @@
 // Therefore, some kind of optimization must be made.
 
 import axios from 'axios';
-import { Handler } from '@netlify/functions';
+import { Handler, schedule } from '@netlify/functions';
 import faunadb from 'faunadb';
-import { faunaClient } from './faunaClient.js';
-import { getApiVersion } from './SNTF_API/getApiVersion.js';
-import { loadSNTFCSV } from './SNTF_API/loadSNTFCSV.js';
-import { mappers } from './SNTF_API/index.js';
+import { faunaClient } from '../faunaClient.js';
+import { getApiVersion } from '../SNTF_API/getApiVersion.js';
+import { loadSNTFCSV } from '../SNTF_API/loadSNTFCSV.js';
+import { mappers } from '../SNTF_API/index.js';
 
 const {
   Collection,
@@ -167,3 +167,13 @@ export function updaterWrapper(handler: Handler) {
     return await handler(...args);
   };
 }
+
+async function scheduler() {
+  await versionUpdater();
+
+  return {
+    statusCode: 200,
+  };
+}
+
+export const handler = schedule('@hourly', scheduler);

@@ -1,7 +1,7 @@
 import faunadb from 'faunadb';
 import { sleep } from './utils.js';
 import { faunaClient } from './faunaClient.js';
-import { versionUpdater } from './versionUpdater.js';
+import { versionUpdater } from './functions/versionUpdater.js';
 
 const { Map, Collections, Delete, Lambda, Paginate, Var, Do } = faunadb;
 
