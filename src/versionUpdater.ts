@@ -1,6 +1,16 @@
+// Oct 1, 10:26:46 AM: 1753368d Duration: 8681.65 ms	Memory Usage: 103 MB	Init Duration: 213.89 ms
+// This function takes about 9 seconds to update the data, which is close to netlify limits (10s).
+// Therefore, some kind of optimization must be made.
+
 import axios from 'axios';
 import { Handler } from '@netlify/functions';
-import {
+import faunadb from 'faunadb';
+import { faunaClient } from './faunaClient.js';
+import { getApiVersion } from './SNTF_API/getApiVersion.js';
+import { loadSNTFCSV } from './SNTF_API/loadSNTFCSV.js';
+import { mappers } from './SNTF_API/index.js';
+
+const {
   Collection,
   Get,
   Lambda,
@@ -18,11 +28,7 @@ import {
   Update,
   Exists,
   If,
-} from 'faunadb';
-import { faunaClient } from './faunaClient.js';
-import { getApiVersion } from '../SNTF_API/getApiVersion.js';
-import { loadSNTFCSV } from '../SNTF_API/loadSNTFCSV.js';
-import { mappers } from '../SNTF_API/index.js';
+} = faunadb;
 
 const { SNTF_HOST } = process.env;
 const versionDocRef = Ref(Collection('versions'), '0');
@@ -124,7 +130,7 @@ async function getApiData(
   };
 }
 
-async function versionUpdater(): Promise<void> {
+export async function versionUpdater(): Promise<void> {
   const dbVersionInfo = await getDBVersionInfo();
   const shouldReCheck =
     !dbVersionInfo || dbVersionInfo.timeDiffInMs > 6 * 60 * 60 * 1000; // 6 hours

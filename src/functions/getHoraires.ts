@@ -1,5 +1,5 @@
 import { Handler } from '@netlify/functions';
-import { updaterWrapper } from './versionUpdater.js';
+import { updaterWrapper } from '../versionUpdater.js';
 
 const unWrapperHandler: Handler = async () => {
   return {
