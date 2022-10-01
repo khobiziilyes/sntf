@@ -98,29 +98,29 @@ async function getApiData(
     transformResponse: _ => _,
   });
 
-  const baremes = await loadSNTFCSV(
+  /* const baremes = await loadSNTFCSV(
     axiosClient,
     'baremes',
     mappers.baremeMapper,
-  );
+  ); */
 
   // const prices = await loadSNTFCSV(axiosClient, 'prix', mappers.priceMapper);
-  // const gares = await loadSNTFCSV(axiosClient, 'gares', mappers.gareMapper);
+  const gares = await loadSNTFCSV(axiosClient, 'gares', mappers.gareMapper);
 
-  /* const trains = (
+  const trains = (
     await loadSNTFCSV(axiosClient, 'trains', mappers.trainMapper)
-  ).filter(_ => _.published); */
+  ).filter(_ => _.published);
 
-  /* const horaires = (
+  const horaires = (
     await loadSNTFCSV(axiosClient, 'horaires', mappers.horaireMapper)
-  ).sort((a, b) => a.timestamp - b.timestamp); // Should filter by existing train_id ONLY */
+  ).sort((a, b) => a.timestamp - b.timestamp); // TODO: Should filter by existing train_id ONLY */
 
   return {
-    // gares,
-    baremes,
+    gares,
+    // baremes,
     // prices,
-    // trains,
-    // horaires,
+    trains,
+    horaires,
   };
 }
 
