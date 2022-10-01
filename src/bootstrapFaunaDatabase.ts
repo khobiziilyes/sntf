@@ -3,16 +3,7 @@ import { sleep } from './utils.js';
 import { faunaClient } from './faunaClient.js';
 import { versionUpdater } from './versionUpdater.js';
 
-const {
-  Map,
-  Collections,
-  Delete,
-  Lambda,
-  Paginate,
-  Var,
-  Do,
-  CreateCollection,
-} = faunadb;
+const { Map, Collections, Delete, Lambda, Paginate, Var, Do } = faunadb;
 
 const sleepMinute = () => sleep(61 * 1000); // 1 extra second just to be sure.
 
@@ -36,11 +27,13 @@ async function databaseDown() {
 }
 
 async function databaseUp() {
+  return;
+
   // TODO: create the indexes
   // prettier-ignore
   await faunaClient.query(
     Do(
-      CreateCollection({ name: 'versions' })
+      // CreateCollection({ name: 'versions' })
     )
   );
 }

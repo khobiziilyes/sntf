@@ -31,7 +31,9 @@ const {
 } = faunadb;
 
 const { SNTF_HOST } = process.env;
-const versionDocRef = Ref(Collection('versions'), '0');
+
+const versionsCollectionObj = Collection('versions');
+const versionDocRef = Ref(versionsCollectionObj, '0');
 
 async function getDBVersionInfo(): Promise<{
   lastDBVersion: number;
@@ -69,6 +71,14 @@ async function setDBVersionInfo(versionNumber: number): Promise<void> {
   // prettier-ignore
   await faunaClient.query(
     If(
+      Exists(versionsCollectionObj),
+      null,
+      CreateCollection({ name: 'versions' })
+    )
+  )
+  // prettier-ignore
+  await faunaClient.query(
+    If(
       Exists(versionDocRef),
       Update(versionDocRef, newDoc),
       Create(versionDocRef, newDoc)
@@ -86,10 +96,12 @@ async function loadItemsToCollection(
     Map(
       arr.map(_ => [_.id, _]),
       Lambda(['theId', 'data'],
-        Create(
-          Ref(Collection(collection_name), Var('theId')),
-          { data: Var('data') }
-        )
+      Let({
+        doc: Create(
+            Ref(Collection(collection_name), Var('theId')),
+            { data: Var('data') }
+          )
+        }, {})
       )
     )
   )
