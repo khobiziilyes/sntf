@@ -2,13 +2,13 @@
 // This function takes about 9 seconds to update the data, which is close to netlify limits (10s).
 // Therefore, some kind of optimization must be made.
 
+import * as functions from 'firebase-functions';
 import axios from 'axios';
-import { Handler, schedule } from '@netlify/functions';
 import faunadb from 'faunadb';
-import { faunaClient } from '../faunaClient.js';
-import { getApiVersion } from '../SNTF_API/getApiVersion.js';
-import { loadSNTFCSV } from '../SNTF_API/loadSNTFCSV.js';
-import { mappers } from '../SNTF_API/index.js';
+import { faunaClient } from './faunaClient.js';
+import { getApiVersion } from './SNTF_API/getApiVersion.js';
+import { loadSNTFCSV } from './SNTF_API/loadSNTFCSV.js';
+import { mappers } from './SNTF_API/index.js';
 
 const {
   Collection,
@@ -143,6 +143,8 @@ async function getApiData(
 }
 
 export async function versionUpdater(): Promise<void> {
+  console.info('Executing version updater ...');
+
   const dbVersionInfo = await getDBVersionInfo();
   const shouldReCheck =
     !dbVersionInfo || dbVersionInfo.timeDiffInMs > 6 * 60 * 60 * 1000; // 6 hours
@@ -161,19 +163,11 @@ export async function versionUpdater(): Promise<void> {
   await setDBVersionInfo(latestApiVersion);
 }
 
-export function updaterWrapper(handler: Handler) {
-  return async (...args: [any, any, any]) => {
+export function updaterWrapper(handler: any) {
+  return functions.https.onRequest(async (request, response) => {
     await versionUpdater();
-    return await handler(...args);
-  };
+
+    console.info('Calling the handler ...');
+    return handler(request, response);
+  });
 }
-
-async function scheduler() {
-  await versionUpdater();
-
-  return {
-    statusCode: 200,
-  };
-}
-
-export const handler = schedule('@hourly', scheduler);

@@ -1,9 +1,7 @@
-import * as functions from 'firebase-functions';
+import { updaterWrapper } from './versionUpdater.js';
 
-// Start writing Firebase Functions
-// https://firebase.google.com/docs/functions/typescript
+async function _getFirstHoraire(_req, res) {
+  res.send('We good so far.');
+}
 
-export const helloWorld = functions.https.onRequest((_request, response) => {
-  functions.logger.info('Hello logs!', { structuredData: true });
-  response.send('Hello from Firebase!');
-});
+export const getFirstHoraire = updaterWrapper(_getFirstHoraire);
