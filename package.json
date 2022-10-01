@@ -31,7 +31,7 @@
     "test": "jest --coverage",
     "prettier": "prettier --config .prettierrc --write .",
     "test:watch": "jest --watch",
-    "db:bootstrap": "node ./scripts/bootstrap-fauna-database.js"
+    "db:bootstrap": "node ./build/functions/bootstrapFaunaDatabase.js"
   },
   "author": "Ilyes Khobizi <khobizi.ilyes@gmail.com>",
   "license": "Apache-2.0",
