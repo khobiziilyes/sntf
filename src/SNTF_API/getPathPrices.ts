@@ -3,7 +3,7 @@
 
 import { getPathDistances } from './getPathDistances.js';
 
-export function getPathPrices(paths, trainsById, baremesById, prixByBareme) {
+export function getPathPrices(paths, trainsById, prixByBareme) {
   const pathsTrains = paths.map(_ => trainsById[_[0].train_id]); // Interesting: bareme_id
   // const pathsGares = paths.map(_ => _.map(_ => garesById[_.gare_id])); // Interesting: Nothing.
   // const trainsTaxes = pathsTrains.map(_ => baremesById[_.bareme_id].taxes); // Interesing: Nothing.
