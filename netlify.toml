@@ -1,5 +1,0 @@
-# example netlify.toml
-[build]
-  command = "npm run build:release"
-  functions = "src/functions"
-  publish = "build"
