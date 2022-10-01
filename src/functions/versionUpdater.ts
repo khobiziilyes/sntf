@@ -35,10 +35,7 @@ async function getDBVersionInfo(): Promise<{
   const data: any[] | null = await faunaClient.query(
     If(
       Exists(versionDocRef),
-      Let(
-        {
-          'doc': Get(versionDocRef)
-        },
+      Let({ 'doc': Get(versionDocRef)},
         [
           Select(['data', 'versionNumber'], Var('doc')),
           ToMillis(Subtract(ToMicros(Now()), Select('ts', Var('doc')))),
@@ -48,14 +45,12 @@ async function getDBVersionInfo(): Promise<{
     )
   );
 
-  if (!data) return null;
-
-  const [lastDBVersion, timeDiffInMs] = data;
-
-  return {
-    lastDBVersion,
-    timeDiffInMs,
-  };
+  return data
+    ? {
+        lastDBVersion: data[0],
+        timeDiffInMs: data[1],
+      }
+    : null;
 }
 
 async function setDBVersionInfo(versionNumber: number): Promise<void> {
@@ -129,18 +124,16 @@ async function getApiData(
   };
 }
 
-export const handler: Handler = async () => {
+async function versionUpdater(): Promise<void> {
   const dbVersionInfo = await getDBVersionInfo();
-  const isUpToDate =
-    dbVersionInfo !== null && dbVersionInfo.timeDiffInMs < 6 * 60 * 60 * 1000; // 6 hours
+  const shouldReCheck =
+    !dbVersionInfo || dbVersionInfo.timeDiffInMs > 6 * 60 * 60 * 1000; // 6 hours
 
-  if (isUpToDate)
-    return {
-      statusCode: 200,
-      body: 'UPTODATE BABY!!!',
-    };
+  if (!shouldReCheck) return;
 
   const latestApiVersion = await getApiVersion(process.env.SNTF_HOST);
+  if (dbVersionInfo?.lastDBVersion === latestApiVersion) return;
+
   const latestData = await getApiData(latestApiVersion);
 
   for (const [collection_name, arr] of Object.entries(latestData)) {
@@ -148,9 +141,11 @@ export const handler: Handler = async () => {
   }
 
   await setDBVersionInfo(latestApiVersion);
+}
 
-  return {
-    statusCode: 200,
-    body: 'We good',
+export function updaterWrapper(handler: Handler) {
+  return async (...args: [any, any, any]) => {
+    await versionUpdater();
+    return await handler(...args);
   };
-};
+}

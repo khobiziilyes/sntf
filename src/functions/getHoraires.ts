@@ -1,10 +1,11 @@
 import { Handler } from '@netlify/functions';
+import { updaterWrapper } from './versionUpdater.js';
 
-const handler: Handler = async () => {
+const unWrapperHandler: Handler = async () => {
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: 'Hello World' }),
+    body: 'WE GOOD!!',
   };
 };
 
-export { handler };
+export const handler = updaterWrapper(unWrapperHandler);
