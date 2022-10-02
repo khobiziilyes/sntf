@@ -3,9 +3,8 @@ type Nnumber = number | null;
 export interface IGare {
   id: number;
   region_code: number;
-  names: {
-    [lang: string]: string;
-  };
+  frName: string;
+  arName: string;
   location: {
     lat: number;
     log: number;

@@ -82,7 +82,7 @@ async function getApiData(
 export async function versionUpdater(): Promise<void> {
   const dbVersionInfo = await getDBVersionInfo();
   const shouldReCheck =
-    true || !dbVersionInfo || dbVersionInfo.secondsDiff > 6 * 60 * 60; // 6 hours
+    !dbVersionInfo || dbVersionInfo.secondsDiff > 6 * 60 * 60; // 6 hours
 
   if (!shouldReCheck) return;
   console.info('Executing version updater ...');

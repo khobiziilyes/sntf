@@ -27,10 +27,8 @@ export function gareMapper(obj: IRawGare): IGare {
   return {
     id: +obj.id,
     region_code: +obj.region_code,
-    names: {
-      ar: obj.nom_ar,
-      fr: obj.nom_fr,
-    },
+    frName: obj.nom_fr,
+    arName: obj.nom_ar,
     location: {
       lat: +obj.lat,
       log: +obj.log,
