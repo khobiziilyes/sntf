@@ -1,6 +1,3 @@
-import * as firebaseAdmin from 'firebase-admin/app';
-firebaseAdmin.initializeApp();
-
 import * as functions from 'firebase-functions';
 import { updaterWrapper } from './versionUpdater.js';
 
