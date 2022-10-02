@@ -4,6 +4,5 @@
     "sourceMap": false,
     "removeComments": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["src/main.ts"]
+  "include": ["src/**/*"]
 }

@@ -4,107 +4,42 @@
 
 import * as functions from 'firebase-functions';
 import axios from 'axios';
-import faunadb from 'faunadb';
-import { faunaClient } from './faunaClient.js';
 import { getApiVersion } from './SNTF_API/getApiVersion.js';
 import { loadSNTFCSV } from './SNTF_API/loadSNTFCSV.js';
 import { mappers } from './SNTF_API/index.js';
-
-const {
-  Collection,
-  Get,
-  Lambda,
-  Let,
-  Now,
-  Select,
-  Subtract,
-  ToMicros,
-  ToMillis,
-  Var,
-  Map,
-  Create,
-  Ref,
-  CreateCollection,
-  Update,
-  Exists,
-  If,
-} = faunadb;
+import { firestore } from './firestore.js';
 
 const { SNTF_HOST } = process.env;
 
-const versionsCollectionObj = Collection('versions');
-const versionDocRef = Ref(versionsCollectionObj, '0');
+const versionDocRef = firestore.collection('versions').doc('0');
 
 async function getDBVersionInfo(): Promise<{
   lastDBVersion: number;
-  timeDiffInMs: number;
+  secondsDiff: number;
 } | null> {
-  // prettier-ignore
-  const data: any[] | null = await faunaClient.query(
-    If(
-      Exists(versionDocRef),
-      Let({ 'doc': Get(versionDocRef)},
-        [
-          Select(['data', 'versionNumber'], Var('doc')),
-          ToMillis(Subtract(ToMicros(Now()), Select('ts', Var('doc')))),
-        ]
-      ),
-      null
-    )
+  return versionDocRef.get().then(docSnapshot =>
+    docSnapshot.exists
+      ? versionDocRef.get().then(doc => ({
+          secondsDiff: Math.floor(Date.now() / 1000) - doc.updateTime.seconds,
+          lastDBVersion: doc.data().versionNumber,
+        }))
+      : null,
   );
-
-  return data
-    ? {
-        lastDBVersion: data[0],
-        timeDiffInMs: data[1],
-      }
-    : null;
 }
 
 async function setDBVersionInfo(versionNumber: number): Promise<void> {
-  const newDoc = {
-    data: {
-      versionNumber,
-    },
-  };
-
-  // prettier-ignore
-  await faunaClient.query(
-    If(
-      Exists(versionsCollectionObj),
-      null,
-      CreateCollection({ name: 'versions' })
-    )
-  )
-  // prettier-ignore
-  await faunaClient.query(
-    If(
-      Exists(versionDocRef),
-      Update(versionDocRef, newDoc),
-      Create(versionDocRef, newDoc)
-    )
-  )
+  await versionDocRef.set({
+    versionNumber,
+  });
 }
 
 async function loadItemsToCollection(
   collection_name: string,
   arr: any[],
 ): Promise<void> {
-  await faunaClient.query(CreateCollection({ name: collection_name }));
-  // prettier-ignore
-  await faunaClient.query(
-    Map(
-      arr.map(_ => [_.id, _]),
-      Lambda(['theId', 'data'],
-      Let({
-        doc: Create(
-            Ref(Collection(collection_name), Var('theId')),
-            { data: Var('data') }
-          )
-        }, {})
-      )
-    )
-  )
+  // TODO: use batch creation instead.
+  const collection = firestore.collection(collection_name);
+  await Promise.all(arr.map(doc => collection.doc(doc.id + '').set(doc)));
 }
 
 async function getApiData(
@@ -120,9 +55,11 @@ async function getApiData(
     axiosClient,
     'baremes',
     mappers.baremeMapper,
-  ); */
+  );
 
-  // const prices = await loadSNTFCSV(axiosClient, 'prix', mappers.priceMapper);
+  const prices = await loadSNTFCSV(axiosClient, 'prix', mappers.priceMapper);
+  */
+
   const gares = await loadSNTFCSV(axiosClient, 'gares', mappers.gareMapper);
 
   const trains = (
@@ -131,7 +68,7 @@ async function getApiData(
 
   const horaires = (
     await loadSNTFCSV(axiosClient, 'horaires', mappers.horaireMapper)
-  ).sort((a, b) => a.timestamp - b.timestamp); // TODO: Should filter by existing train_id ONLY */
+  ).sort((a, b) => a.timestamp - b.timestamp); // TODO: Should filter by existing train_id ONLY
 
   return {
     gares,
@@ -143,13 +80,12 @@ async function getApiData(
 }
 
 export async function versionUpdater(): Promise<void> {
-  console.info('Executing version updater ...');
-
   const dbVersionInfo = await getDBVersionInfo();
   const shouldReCheck =
-    !dbVersionInfo || dbVersionInfo.timeDiffInMs > 6 * 60 * 60 * 1000; // 6 hours
+    true || !dbVersionInfo || dbVersionInfo.secondsDiff > 6 * 60 * 60; // 6 hours
 
   if (!shouldReCheck) return;
+  console.info('Executing version updater ...');
 
   const latestApiVersion = await getApiVersion(process.env.SNTF_HOST);
   if (dbVersionInfo?.lastDBVersion === latestApiVersion) return;
@@ -157,17 +93,17 @@ export async function versionUpdater(): Promise<void> {
   const latestData = await getApiData(latestApiVersion);
 
   for (const [collection_name, arr] of Object.entries(latestData)) {
-    await loadItemsToCollection(`${collection_name}_${latestApiVersion}`, arr);
+    await loadItemsToCollection(collection_name, arr);
   }
 
   await setDBVersionInfo(latestApiVersion);
 }
 
 export function updaterWrapper(handler: any) {
-  return functions.https.onRequest(async (request, response) => {
+  return async (request, response) => {
     await versionUpdater();
 
     console.info('Calling the handler ...');
     return handler(request, response);
-  });
+  };
 }

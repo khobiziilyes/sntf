@@ -1,11 +1,8 @@
-import faunadb from 'faunadb';
 import { sleep } from './utils.js';
-import { faunaClient } from './faunaClient.js';
+import { firestore } from './firestore.js';
 import { versionUpdater } from './versionUpdater.js';
 
-const { Map, Collections, Delete, Lambda, Paginate, Var, Do } = faunadb;
-
-const sleepMinute = () => sleep(61 * 1000); // 1 extra second just to be sure.
+/* const sleepMinute = () => sleep(61 * 1000); // 1 extra second just to be sure.
 
 // prettier-ignore
 Promise.resolve()
@@ -37,3 +34,4 @@ async function databaseUp() {
     )
   );
 }
+*/

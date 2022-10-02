@@ -2,26 +2,25 @@
   "name": "sntf",
   "main": "build/src/index.js",
   "version": "1.0.0",
-  "description": "Minimalistic API to request SNTF endpoints and map them to understandable structure.",
+  "description": "Minimalistic API to request SNTF endpoints and map them to an understandable structure.",
   "type": "module",
   "engines": {
     "node": "16"
   },
   "scripts": {
     "start": "npm run shell",
-    "clean": "rimraf coverage build tmp",
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -w -p tsconfig.json",
     "build:release": "npm run clean && tsc -p tsconfig.release.json",
-    "lint": "eslint . --ext .ts --ext .mts",
-    "test": "jest --coverage",
-    "prettier": "prettier --config .prettierrc --write .",
+    "clean": "rimraf coverage build tmp",
     "test:watch": "jest --watch",
-    "db:bootstrap": "node ./build/src/bootstrapFaunaDatabase.js",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "lint": "eslint . --ext .ts --ext .mts",
+    "prettier": "prettier --config .prettierrc --write .",
+    "test": "jest --coverage"
   },
   "author": "Ilyes Khobizi <khobizi.ilyes@gmail.com>",
   "license": "Apache-2.0",
@@ -29,7 +28,6 @@
     "axios": "^0.27.2",
     "csv-parse": "^5.3.0",
     "dotenv": "^16.0.2",
-    "faunadb": "^4.7.0",
     "tslib": "~2.4",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.18.0"
