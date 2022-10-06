@@ -7,6 +7,16 @@ function parseInt(str: string): number | null {
   return parsed;
 }
 
+function fixName(str: string): string {
+  return str
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map(_ =>
+      (_ && _.length && _[0].toUpperCase() + _.slice(1).toLowerCase()).trim(),
+    )
+    .join(' ');
+}
+
 export function gareMapper(obj: IRawGare): IGare {
   const next = Array<number>();
 
@@ -24,11 +34,14 @@ export function gareMapper(obj: IRawGare): IGare {
     if (parsedAr) next.push(parsedAr);
   }
 
+  const frName = fixName(obj.nom_fr);
+  const arName = fixName(obj.nom_ar);
+
   return {
     id: +obj.id,
     region_code: +obj.region_code,
-    frName: obj.nom_fr,
-    arName: obj.nom_ar,
+    frName,
+    arName,
     location: {
       lat: +obj.lat,
       log: +obj.log,
