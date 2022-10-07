@@ -20,7 +20,7 @@ export function horaireMapper(obj: IRawHoraire): IHoraire {
     time: new Date(),
     is_time_tomorrow,
     distance: +obj.distance,
-    time_str: obj.heure,
+    time_str: splitedTime.slice(0, -1).join(':'),
     timestamp,
   };
 }
