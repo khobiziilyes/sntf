@@ -2,9 +2,15 @@ export function parseNullableString(str: string): string | null {
   return str.toUpperCase() === 'NULL' ? null : str;
 }
 
-export function groupBy<T>(arr: T[], key: string): { [key: string]: T[] } {
+export function groupBy<T>(
+  arr: T[],
+  key: string,
+  getElem: (T) => any = null,
+): { [key: string]: T[] } {
   return arr.reduce((acc, elem) => {
-    (acc[elem[key]] = acc[elem[key]] || []).push(elem);
+    const finalElem = getElem ? getElem(elem) : elem;
+    (acc[elem[key]] = acc[elem[key]] || []).push(finalElem);
+
     return acc;
   }, {});
 }

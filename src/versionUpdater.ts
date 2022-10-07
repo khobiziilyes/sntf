@@ -2,16 +2,20 @@
 // This function takes about 9 seconds to update the data, which is close to netlify limits (10s).
 // Therefore, some kind of optimization must be made.
 
-import * as functions from 'firebase-functions';
 import axios from 'axios';
 import { getApiVersion } from './SNTF_API/getApiVersion.js';
 import { loadSNTFCSV } from './SNTF_API/loadSNTFCSV.js';
 import { mappers } from './SNTF_API/index.js';
 import { firestore } from './firestore.js';
+import { byId, groupBy } from './utils.js';
 
 const { SNTF_HOST } = process.env;
 
 const versionDocRef = firestore.collection('versions').doc('0');
+
+function getAllCombinations(arr: any[]) {
+  return arr.flatMap((v, i) => arr.slice(i + 1).map(w => v + '-' + w));
+}
 
 async function getDBVersionInfo(): Promise<{
   lastDBVersion: number;
@@ -66,16 +70,29 @@ async function getApiData(
     await loadSNTFCSV(axiosClient, 'trains', mappers.trainMapper)
   ).filter(_ => _.published);
 
+  const trainsById = byId(trains, _ => _.id);
+
   const horaires = (
     await loadSNTFCSV(axiosClient, 'horaires', mappers.horaireMapper)
-  ).sort((a, b) => a.timestamp - b.timestamp); // TODO: Should filter by existing train_id ONLY
+  )
+    .filter(_ => trainsById[_.train_id])
+    .sort((a, b) => a.timestamp - b.timestamp);
+
+  const horairesGroupedByTrain = Object.entries(
+    groupBy(horaires, 'train_id'),
+  ).map(_ => ({
+    id: _[0], // train_id
+    horaires: _[1],
+    gares: getAllCombinations([...new Set(_[1].map(_ => _.gare_id))]),
+  }));
 
   return {
     gares,
     // baremes,
     // prices,
     trains,
-    horaires,
+    // horaires,
+    horairesGroupedByTrain,
   };
 }
 
