@@ -1,3 +1,7 @@
+export function booleanString(str: string): boolean {
+  return Number.parseInt(str) > 0;
+}
+
 export function parseNullableString(str: string): string | null {
   return str.toUpperCase() === 'NULL' ? null : str;
 }

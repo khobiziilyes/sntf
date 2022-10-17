@@ -1,8 +1,5 @@
+import { booleanString } from '../../utils.js';
 import { IHoraire, IRawHoraire } from '../interfaces/IHoraire.js';
-
-function booleanString(str: string): boolean {
-  return str === '1';
-}
 
 export function horaireMapper(obj: IRawHoraire): IHoraire {
   const splitedTime = obj.heure.split(':');

@@ -1,22 +1,20 @@
+import { booleanString } from '../../utils.js';
 import {
   DaysAvailabilityObj,
   IRawTrain,
   ITrain,
 } from '../interfaces/ITrain.js';
 
-function booleanString(str: string): boolean {
-  return str === '1';
-}
-
 export function trainMapper(obj: IRawTrain): ITrain {
   const mode_circulation = (() => {
-    const original_mode = +obj.mode_circulation;
+    const original_mode = Number.parseInt(obj.mode_circulation);
 
+    if (original_mode === 0) return 'ALWAYS';
     if (original_mode === 1) return 'EXCEPT_FRIDAY_AND_HOLIDAYS';
     if (original_mode === 2) return 'ONLY_FRIDAY_AND_HOLIDAYS';
     if (original_mode === 3) return 'WEEKDAYS';
 
-    return 'ALWAYS';
+    return null;
   })();
 
   // To quickly build the object.
@@ -32,13 +30,16 @@ export function trainMapper(obj: IRawTrain): ITrain {
       ['Sat', 'sam', false],
     ] as [string, string, boolean][]
   ).reduce((acc, elem) => {
-    acc[elem[0]] =
-      mode_circulation === 'ALWAYS' ||
-      (mode_circulation === 'WEEKDAYS' && elem[2]) ||
-      (mode_circulation === 'ONLY_FRIDAY_AND_HOLIDAYS' && elem[0] === 'Fri') ||
-      (mode_circulation === 'EXCEPT_FRIDAY_AND_HOLIDAYS' &&
-        elem[0] !== 'Fri') ||
-      booleanString(obj[elem[1]]);
+    const mapper = {
+      ALWAYS: true,
+      WEEKDAYS: elem[2],
+      ONLY_FRIDAY_AND_HOLIDAYS: elem[0] === 'Fri',
+      EXCEPT_FRIDAY_AND_HOLIDAYS: elem[0] !== 'Fri',
+      null: booleanString(obj[elem[1]]),
+    };
+
+    acc[elem[0]] = mapper[mode_circulation];
+    // acc[elem[0]] = booleanString(obj[elem[1]]);
 
     return acc;
   }, {} as DaysAvailabilityObj);

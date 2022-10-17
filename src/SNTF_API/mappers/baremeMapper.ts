@@ -1,8 +1,5 @@
+import { booleanString } from '../../utils.js';
 import { IBareme, IRawBareme } from '../interfaces/IBareme.js';
-
-function booleanString(str: string): boolean {
-  return str === '1';
-}
 
 export function baremeMapper(obj: IRawBareme): IBareme {
   const taxes = Array<number>();
