@@ -1,3 +1,12 @@
+export interface DaysAvailabilityObj {
+  Sun: boolean;
+  Mon: boolean;
+  Tue: boolean;
+  Wed: boolean;
+  Thu: boolean;
+  Fri: boolean;
+  Sat: boolean;
+}
 interface seatsClass {
   exists: boolean;
   seats: boolean;
@@ -36,15 +45,7 @@ export interface ITrain {
     second: seatsClass;
   };
 
-  available_days: {
-    Sun: boolean;
-    Mon: boolean;
-    Tue: boolean;
-    Wed: boolean;
-    Thu: boolean;
-    Fri: boolean;
-    Sat: boolean;
-  };
+  available_days: DaysAvailabilityObj;
 
   comments: { [lang: string]: string };
 }
