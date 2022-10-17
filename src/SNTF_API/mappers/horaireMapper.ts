@@ -13,6 +13,11 @@ export function horaireMapper(obj: IRawHoraire): IHoraire {
     is_time_tomorrow ? 24 * 60 * 60 : 0,
   );
 
+  const time_str = splitedTime
+    .slice(0, -1)
+    .map(_ => String(_).padStart(2, '0'))
+    .join(':');
+
   return {
     id: +obj.id,
     train_id: +obj.train_id,
@@ -20,7 +25,7 @@ export function horaireMapper(obj: IRawHoraire): IHoraire {
     time: new Date(),
     is_time_tomorrow,
     distance: +obj.distance,
-    time_str: splitedTime.slice(0, -1).join(':'),
+    time_str,
     timestamp,
   };
 }
