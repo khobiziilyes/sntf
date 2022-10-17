@@ -9,7 +9,8 @@ import { mappers } from './SNTF_API/index.js';
 import { firestore } from './firestore.js';
 import { byId, groupBy } from './utils.js';
 
-const { SNTF_HOST } = process.env;
+const { SNTF_HOST, NODE_ENV } = process.env;
+const isDev = NODE_ENV === 'dev';
 
 const versionDocRef = firestore.collection('versions').doc('0');
 
@@ -99,7 +100,7 @@ async function getApiData(
 export async function versionUpdater(): Promise<void> {
   const dbVersionInfo = await getDBVersionInfo();
   const shouldReCheck =
-    !dbVersionInfo || dbVersionInfo.secondsDiff > 6 * 60 * 60; // 6 hours
+    isDev || !dbVersionInfo || dbVersionInfo.secondsDiff > 6 * 60 * 60; // 6 hours
 
   if (!shouldReCheck) return;
   console.info('Executing version updater ...');
